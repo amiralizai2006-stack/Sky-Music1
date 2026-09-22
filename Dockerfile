@@ -1,17 +1,23 @@
-FROM debian:latest
+FROM python:3.11-slim
 
-RUN apt update && apt upgrade -y
-RUN apt install -y git curl python3-pip ffmpeg
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    ffmpeg \
+    libxml2-dev \
+    libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /app/
-WORKDIR /app/
+WORKDIR /app
 
-COPY . /app/
+COPY requirements.txt .
 
-RUN pip3 install -r requirements.txt --break-system-packages
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
+COPY . .
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
-RUN npm i -g npm
+RUN npm install -g npm
 
-CMD ["python3", "-m", "MusicMan"]
+CMD ["python", "-m", "MusicMan"]
